@@ -26,10 +26,10 @@
     --text:      #F5F1EA;
     --text-2:    #C9C5BD;
     --text-3:    #7A776F;
-    --accent:    #E2C275;
-    --accent-2:  #B5894A;
-    --accent-soft: rgba(226, 194, 117, 0.08);
-    --grid-line: rgba(226, 194, 117, 0.04);
+    --accent:    #4FA8FF;
+    --accent-2:  #2785E8;
+    --accent-soft: rgba(79, 168, 255, 0.08);
+    --grid-line: rgba(79, 168, 255, 0.04);
     --noise-blend: overlay;
     --noise-opacity: 0.035;
   }
@@ -48,6 +48,10 @@
     --grid-line: rgba(242, 107, 31, 0.05);
     --noise-blend: multiply;
     --noise-opacity: 0.025;
+  }
+
+  html {
+    font-size: 18px; /* 根字級：所有 rem 從這裡等比放大 */
   }
 
   html, body {
@@ -264,6 +268,26 @@
   .rounded-block { border-radius: 14px; }
 
   .stat-num { font-variant-numeric: tabular-nums; }
+
+  /* ===== Scenario tab ===== */
+  .scenario-tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text-2);
+    background: transparent;
+    transition: all 200ms ease;
+    cursor: none;
+  }
+  .scenario-tab:hover { border-color: var(--accent); color: var(--text); }
+  .scenario-tab.selected {
+    border-color: var(--accent);
+    background-color: var(--accent-soft);
+    color: var(--text);
+  }
 
   .slide::-webkit-scrollbar { width: 6px; }
   .slide::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
@@ -870,43 +894,17 @@
         </div>
 
         <div class="col-span-12 lg:col-span-7">
-          <p class="kicker mb-6">範例情境 · 廣告創意業</p>
-
-          <div class="space-y-4 mb-8">
-            <div class="flex items-baseline justify-between border-b border-app pb-3">
-              <span class="text-app2 text-sm">人數</span>
-              <span class="display-heavy text-app text-2xl">3 <span class="text-app3 text-sm">位 AE</span></span>
-            </div>
-            <div class="flex items-baseline justify-between border-b border-app pb-3">
-              <span class="text-app2 text-sm">每人每週重複性工作時數</span>
-              <span class="display-heavy text-app text-2xl">5 <span class="text-app3 text-sm">小時</span></span>
-            </div>
-            <div class="flex items-baseline justify-between border-b border-app pb-3">
-              <span class="text-app2 text-sm">平均時薪</span>
-              <span class="display-heavy text-app text-2xl">NT$ 300</span>
-            </div>
-            <div class="flex items-baseline justify-between border-b border-app pb-3">
-              <span class="text-app2 text-sm">AI 替代比例</span>
-              <span class="display-heavy text-app text-2xl">40<span class="text-app3 text-sm">%</span></span>
+          <div class="flex items-center justify-between mb-6">
+            <p class="kicker">範例情境</p>
+            <div class="flex flex-wrap gap-2" id="scenarioTabs">
+              <button class="scenario-tab selected" data-scenario="ad">廣告創意</button>
+              <button class="scenario-tab" data-scenario="re">房地產</button>
+              <button class="scenario-tab" data-scenario="agency">代銷</button>
+              <button class="scenario-tab" data-scenario="media">廣告媒體</button>
             </div>
           </div>
 
-          <div class="border-2 border-accent rounded-block p-8 bg-app2">
-            <div class="grid grid-cols-3 gap-6">
-              <div>
-                <p class="kicker mb-2">年省金額</p>
-                <p class="display-bold text-accent text-2xl lg:text-3xl stat-num">NT$ 936,000</p>
-              </div>
-              <div>
-                <p class="kicker mb-2">導入投資</p>
-                <p class="display-bold text-app text-2xl lg:text-3xl stat-num">NT$ 80,000</p>
-              </div>
-              <div>
-                <p class="kicker mb-2">ROI 倍數</p>
-                <p class="display-bold text-accent text-3xl lg:text-4xl stat-num">11×</p>
-              </div>
-            </div>
-          </div>
+          <div id="scenarioDetail"></div>
 
           <p class="kicker text-app3 mt-6">＊ 數字為示意，實際試算依客戶現況進行</p>
         </div>
@@ -1249,6 +1247,101 @@
   });
 
   renderIndustry('ad');
+
+  /* -------- Scenario tabs (Slide 9) -------- */
+  const scenarios = {
+    ad: {
+      label: '廣告創意業',
+      people: '3 <span class="text-app3 text-sm">位 AE</span>',
+      hours:  '5 <span class="text-app3 text-sm">小時</span>',
+      rate:   'NT$ 300',
+      ratio:  '40<span class="text-app3 text-sm">%</span>',
+      saving: 'NT$ 936,000',
+      invest: 'NT$ 80,000',
+      roi:    '11×',
+    },
+    re: {
+      label: '房地產業',
+      people: '4 <span class="text-app3 text-sm">位業務</span>',
+      hours:  '6 <span class="text-app3 text-sm">小時</span>',
+      rate:   'NT$ 280',
+      ratio:  '50<span class="text-app3 text-sm">%</span>',
+      saving: 'NT$ 874,000',
+      invest: 'NT$ 65,000',
+      roi:    '13×',
+    },
+    agency: {
+      label: '代銷業',
+      people: '6 <span class="text-app3 text-sm">位跨部門</span>',
+      hours:  '8 <span class="text-app3 text-sm">小時</span>',
+      rate:   'NT$ 320',
+      ratio:  '55<span class="text-app3 text-sm">%</span>',
+      saving: 'NT$ 1,404,000',
+      invest: 'NT$ 100,000',
+      roi:    '14×',
+    },
+    media: {
+      label: '廣告媒體業',
+      people: '5 <span class="text-app3 text-sm">位企劃</span>',
+      hours:  '7 <span class="text-app3 text-sm">小時</span>',
+      rate:   'NT$ 350',
+      ratio:  '55<span class="text-app3 text-sm">%</span>',
+      saving: 'NT$ 1,200,000',
+      invest: 'NT$ 90,000',
+      roi:    '13×',
+    },
+  };
+
+  function renderScenario(key) {
+    const s = scenarios[key];
+    document.getElementById('scenarioDetail').innerHTML = `
+      <div class="space-y-4 mb-8">
+        <div class="flex items-baseline justify-between border-b border-app pb-3">
+          <span class="text-app2 text-sm">人數</span>
+          <span class="display-heavy text-app text-2xl">${s.people}</span>
+        </div>
+        <div class="flex items-baseline justify-between border-b border-app pb-3">
+          <span class="text-app2 text-sm">每人每週重複性工作時數</span>
+          <span class="display-heavy text-app text-2xl">${s.hours}</span>
+        </div>
+        <div class="flex items-baseline justify-between border-b border-app pb-3">
+          <span class="text-app2 text-sm">平均時薪</span>
+          <span class="display-heavy text-app text-2xl">${s.rate}</span>
+        </div>
+        <div class="flex items-baseline justify-between border-b border-app pb-3">
+          <span class="text-app2 text-sm">AI 替代比例</span>
+          <span class="display-heavy text-app text-2xl">${s.ratio}</span>
+        </div>
+      </div>
+      <div class="border-2 border-accent rounded-block p-8 bg-app2">
+        <div class="grid grid-cols-3 gap-6">
+          <div>
+            <p class="kicker mb-2">年省金額</p>
+            <p class="display-bold text-accent text-2xl lg:text-3xl stat-num">${s.saving}</p>
+          </div>
+          <div>
+            <p class="kicker mb-2">導入投資</p>
+            <p class="display-bold text-app text-2xl lg:text-3xl stat-num">${s.invest}</p>
+          </div>
+          <div>
+            <p class="kicker mb-2">ROI 倍數</p>
+            <p class="display-bold text-accent text-3xl lg:text-4xl stat-num">${s.roi}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const scenarioTabBtns = document.querySelectorAll('.scenario-tab');
+  scenarioTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      scenarioTabBtns.forEach(t => t.classList.remove('selected'));
+      btn.classList.add('selected');
+      renderScenario(btn.dataset.scenario);
+    });
+  });
+
+  renderScenario('ad');
 
   /* -------- Custom cursor (smooth follow) -------- */
   (function() {
