@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 導入企業 — 提案簡報</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Noto+Sans+TC:wght@300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  /* ===== Design Tokens (semantic, theme-swappable) ===== */
+  :root[data-theme="dark"] {
+    --bg:        #0E0E10;
+    --bg-2:      #16161A;
+    --bg-3:      #1F1F25;
+    --line:      #2A2A33;
+    --text:      #F5F1EA;
+    --text-2:    #C9C5BD;
+    --text-3:    #7A776F;
+    --accent:    #E2C275;
+    --accent-2:  #B5894A;
+    --accent-soft: rgba(226, 194, 117, 0.08);
+    --grid-line: rgba(226, 194, 117, 0.04);
+    --noise-blend: overlay;
+    --noise-opacity: 0.035;
+  }
+
+  :root[data-theme="light"] {
+    --bg:        #F8F5EF;     /* 暖奶白 */
+    --bg-2:      #FFFFFF;
+    --bg-3:      #F1ECE2;
+    --line:      #E2DCCF;
+    --text:      #1A1612;
+    --text-2:    #4A4339;
+    --text-3:    #8A8275;
+    --accent:    #F26B1F;     /* 亮橘色：主品牌色 */
+    --accent-2:  #C44E0E;
+    --accent-soft: rgba(242, 107, 31, 0.08);
+    --grid-line: rgba(242, 107, 31, 0.05);
+    --noise-blend: multiply;
+    --noise-opacity: 0.025;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    transition: background-color 360ms ease, color 360ms ease;
+    cursor: none; /* 由自訂游標接手 */
+  }
+
+  /* ===== Custom cursor ===== */
+  .cursor-dot,
+  .cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate3d(-50%, -50%, 0);
+    will-change: transform, width, height, opacity;
+  }
+  .cursor-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    transition: opacity 200ms ease, background-color 360ms ease;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0.55;
+    transition:
+      width 220ms ease,
+      height 220ms ease,
+      opacity 200ms ease,
+      border-color 360ms ease,
+      background-color 220ms ease;
+  }
+  .cursor-ring.is-hover {
+    width: 54px; height: 54px;
+    opacity: 0.9;
+    background: var(--accent-soft);
+  }
+  .cursor-ring.is-click {
+    width: 26px; height: 26px;
+    opacity: 1;
+  }
+  @media (hover: none), (pointer: coarse) {
+    html, body { cursor: auto; }
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+
+  /* ===== Slide deck structure ===== */
+  .deck { position: fixed; inset: 0; overflow: hidden; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 4rem 6rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  @media (max-width: 768px) {
+    .slide { padding: 2rem 1.5rem; }
+  }
+
+  /* ===== Typography ===== */
+  .display {
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "ss01", "ss02";
+    letter-spacing: -0.025em;
+  }
+
+  /* 顯示用大標：加重字重 */
+  .display-bold {
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "ss01", "ss02";
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+
+  /* H2 區段標題：加重字重 */
+  .display-heavy {
+    font-family: 'Fraunces', serif;
+    font-feature-settings: "ss01", "ss02";
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+
+  /* 調整「斜體」角度：比 Fraunces 原生 italic 更平緩 */
+  .display i,
+  .display em,
+  .display-bold i,
+  .display-bold em,
+  .display-heavy i,
+  .display-heavy em,
+  .italic {
+    font-style: oblique 6deg;
+    padding-right: 0.12em;
+  }
+
+  .mono { font-family: 'DM Sans', sans-serif; }
+
+  .kicker {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* 全域最小字級保護 */
+  .text-xs { font-size: 0.9rem !important; line-height: 1.65; }
+  .text-sm { font-size: 1rem; line-height: 1.7; }
+
+  /* ===== Color utility classes (token-driven) ===== */
+  .bg-app   { background-color: var(--bg); }
+  .bg-app2  { background-color: var(--bg-2); }
+  .bg-app3  { background-color: var(--bg-3); }
+  .text-app   { color: var(--text); }
+  .text-app2  { color: var(--text-2); }
+  .text-app3  { color: var(--text-3); }
+  .text-accent { color: var(--accent); }
+  .border-app  { border-color: var(--line); }
+  .border-accent { border-color: var(--accent); }
+
+  /* ===== Background atmosphere ===== */
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+  .noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--noise-opacity);
+    mix-blend-mode: var(--noise-blend);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== Reveal animation ===== */
+  .reveal > * {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: rise 700ms ease forwards;
+  }
+  .slide.active .reveal > *:nth-child(1) { animation-delay: 100ms; }
+  .slide.active .reveal > *:nth-child(2) { animation-delay: 220ms; }
+  .slide.active .reveal > *:nth-child(3) { animation-delay: 340ms; }
+  .slide.active .reveal > *:nth-child(4) { animation-delay: 460ms; }
+  .slide.active .reveal > *:nth-child(5) { animation-delay: 580ms; }
+  .slide.active .reveal > *:nth-child(6) { animation-delay: 700ms; }
+  .slide.active .reveal > *:nth-child(7) { animation-delay: 820ms; }
+  .slide.active .reveal > *:nth-child(8) { animation-delay: 940ms; }
+
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  .slide:not(.active) .reveal > * { animation: none; opacity: 0; }
+
+  /* ===== Tier card ===== */
+  .tier-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    transition: transform 240ms ease, border-color 240ms ease, background-color 240ms ease, box-shadow 240ms ease;
+  }
+  .tier-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    background-color: var(--bg-3);
+    box-shadow: 0 12px 32px -16px rgba(0,0,0,0.12);
+  }
+  .tier-card.is-featured {
+    border: 2px solid var(--accent);
+    background-color: var(--bg-2);
+    border-radius: 14px;
+  }
+
+  /* ===== Industry chip ===== */
+  .industry-chip {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text-2);
+    background: transparent;
+    transition: all 200ms ease;
+    cursor: none;
+  }
+  .industry-chip:hover { border-color: var(--accent); color: var(--text); }
+  .industry-chip.selected {
+    border-color: var(--accent);
+    background-color: var(--accent-soft);
+    color: var(--text);
+  }
+
+  /* ===== Generic bordered card ===== */
+  .card-bordered {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    transition: border-color 240ms ease;
+  }
+  .card-bordered:hover { border-color: var(--accent); }
+
+  /* 其他需要倒角的元素 */
+  .rounded-soft { border-radius: 10px; }
+  .rounded-block { border-radius: 14px; }
+
+  .stat-num { font-variant-numeric: tabular-nums; }
+
+  .slide::-webkit-scrollbar { width: 6px; }
+  .slide::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+  /* ===== Underline accent ===== */
+  .accent-underline {
+    background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 0.18em;
+    background-position: 0 88%;
+  }
+
+  /* ===== Progress bar ===== */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    transition: width 400ms ease;
+    z-index: 50;
+  }
+
+  /* ===== HUD ===== */
+  .hud {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 40;
+    pointer-events: none;
+  }
+  .hud > * { pointer-events: auto; }
+
+  .nav-btn {
+    width: 40px; height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    background: var(--bg-2);
+    backdrop-filter: blur(8px);
+    transition: all 200ms ease;
+    cursor: none;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ===== Theme toggle ===== */
+  .theme-toggle {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 60;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-2);
+    color: var(--text-2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 200ms ease;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--text); }
+  .theme-toggle svg {
+    width: 14px; height: 14px;
+    transition: transform 360ms ease;
+  }
+  :root[data-theme="light"] .theme-toggle svg { transform: rotate(180deg); }
+
+  .h-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<div id="progress" class="progress" style="width: 0%"></div>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切換主題">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+  </svg>
+  <span id="themeLabel">Dark</span>
+</button>
+
+<div class="deck" id="deck">
+
+  <!-- ============================================================
+       SLIDE 01 — COVER
+  ============================================================ -->
+  <section class="slide active grid-bg" data-slide="1">
+    <div class="noise"></div>
+    <div class="reveal flex flex-col h-full justify-between">
+
+      <header class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full" style="background: var(--accent);"></div>
+          <span class="kicker text-app2">Proposal · 2026</span>
+        </div>
+        <span class="kicker">Josh · AI Adoption Consulting</span>
+      </header>
+
+      <div class="max-w-5xl">
+        <p class="kicker mb-6">A Proposal for Mid-Market Enterprises</p>
+        <h1 class="display-bold text-app text-[clamp(3rem,8vw,7rem)] leading-[0.95]">
+          讓 AI<br/>
+          <span class="italic text-accent">真正</span>進入<br/>
+          你的<span class="accent-underline">日常工作</span>。
+        </h1>
+        <p class="mt-10 text-app2 text-lg max-w-2xl leading-relaxed">
+          從工作流程診斷到落地導入，協助中小企業把 AI 工具
+          轉化為可量化的營運效率與成本節省。
+        </p>
+      </div>
+
+      <footer class="flex items-end justify-between">
+        <div>
+          <p class="kicker text-app3">Presented by</p>
+          <p class="display-heavy text-app text-2xl mt-1">Josh / AI 導入顧問</p>
+        </div>
+        <div class="text-right">
+          <p class="kicker text-app3">Duration</p>
+          <p class="mono text-app2 mt-1">≈ 20 min</p>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 02 — WHY NOW
+  ============================================================ -->
+  <section class="slide" data-slide="2">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">01 · Context</span>
+        <span class="kicker text-app3">Why Now</span>
+      </header>
+
+      <div class="grid grid-cols-12 gap-12 flex-1">
+        <div class="col-span-12 lg:col-span-5">
+          <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+            為什麼<br/>是<span class="italic text-accent">現在</span>？
+          </h2>
+          <p class="mt-8 text-app2 leading-relaxed">
+            AI 工具已從技術話題，轉為中小企業的營運基礎設施。
+            導入的時機，正在從「要不要」變成「多快」。
+          </p>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7 grid grid-cols-2 gap-px rounded-block overflow-hidden" style="background-color: var(--line);">
+          <div class="bg-app p-8">
+            <p class="kicker mb-3">趨勢一</p>
+            <p class="display-bold text-4xl text-accent stat-num">3×</p>
+            <p class="mt-3 text-app text-sm font-semibold">工具成熟速度</p>
+            <p class="mt-2 text-app3 text-xs leading-relaxed">過去 18 個月，主流 AI 工具的可用度與穩定性大幅提升</p>
+          </div>
+          <div class="bg-app p-8">
+            <p class="kicker mb-3">趨勢二</p>
+            <p class="display-bold text-4xl text-accent stat-num">↓ 80%</p>
+            <p class="mt-3 text-app text-sm font-semibold">使用門檻</p>
+            <p class="mt-2 text-app3 text-xs leading-relaxed">無需工程背景的工作者，也能完成過去仰賴 IT 的任務</p>
+          </div>
+          <div class="bg-app p-8">
+            <p class="kicker mb-3">趨勢三</p>
+            <p class="display-bold text-4xl text-accent stat-num">+62%</p>
+            <p class="mt-3 text-app text-sm font-semibold">企業採用率</p>
+            <p class="mt-2 text-app3 text-xs leading-relaxed">中小企業導入比例逐年上升，但有效落地的比例仍低</p>
+          </div>
+          <div class="bg-app p-8">
+            <p class="kicker mb-3">趨勢四</p>
+            <p class="display-bold text-4xl text-accent stat-num">12 mo.</p>
+            <p class="mt-3 text-app text-sm font-semibold">領先紅利窗口</p>
+            <p class="mt-2 text-app3 text-xs leading-relaxed">早期導入者已開始累積流程優勢，差距正在拉開</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="kicker text-app3 mt-8">＊ 數字為示意，將依實際資料來源更新</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 03 — REALITY
+  ============================================================ -->
+  <section class="slide" data-slide="3">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">02 · Reality</span>
+        <span class="kicker text-app3">Pain Points</span>
+      </header>
+
+      <div class="max-w-3xl">
+        <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+          中小企業的<br/>
+          <span class="italic text-accent">真實處境</span>
+        </h2>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="card-bordered p-8">
+          <p class="display-bold text-3xl text-accent mb-4">01</p>
+          <h3 class="text-app text-lg font-semibold mb-3">工具買了，沒人會用</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            訂閱了 ChatGPT、Notion AI、Claude，但實際使用者集中在少數技術早期採用者，多數團隊回到舊流程。
+          </p>
+        </div>
+
+        <div class="card-bordered p-8">
+          <p class="display-bold text-3xl text-accent mb-4">02</p>
+          <h3 class="text-app text-lg font-semibold mb-3">不知從哪開始</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            老闆想導入但不確定第一步該做什麼，內部討論常停留在「聽說別人怎麼用」的階段。
+          </p>
+        </div>
+
+        <div class="card-bordered p-8">
+          <p class="display-bold text-3xl text-accent mb-4">03</p>
+          <h3 class="text-app text-lg font-semibold mb-3">效益無法量化</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            導入後沒有明確的成效指標，無法對內報告也難以判斷是否要持續投入資源。
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-auto pt-12">
+        <div class="h-line"></div>
+        <p class="mt-6 text-app2 italic display-heavy text-xl leading-relaxed max-w-3xl">
+          「導入失敗，多半不是工具的問題，而是<span class="text-accent not-italic">人和流程</span>沒有被一起設計進來。」
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 04 — REFRAME
+  ============================================================ -->
+  <section class="slide" data-slide="4">
+    <div class="reveal flex flex-col h-full justify-center">
+      <header class="flex items-center justify-between mb-16">
+        <span class="kicker">03 · Reframe</span>
+        <span class="kicker text-app3">A New Definition</span>
+      </header>
+
+      <div class="grid grid-cols-12 gap-12 items-center">
+        <div class="col-span-12 lg:col-span-5">
+          <p class="kicker mb-6 text-accent">重新框架</p>
+          <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+            AI 導入<br/>是一個
+            <span class="italic text-accent">人</span>的<br/>專案。
+          </h2>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7 space-y-8">
+          <div class="flex items-start gap-6">
+            <span class="display text-app3 text-2xl">→</span>
+            <div>
+              <p class="kicker mb-2">舊框架</p>
+              <p class="text-app2 leading-relaxed">把 AI 視為技術專案，由 IT 部門主導工具選型，業務單位被動接收。</p>
+            </div>
+          </div>
+
+          <div class="h-line"></div>
+
+          <div class="flex items-start gap-6">
+            <span class="display-bold text-accent text-2xl">→</span>
+            <div>
+              <p class="kicker mb-2 text-accent">新框架</p>
+              <p class="text-app text-lg leading-relaxed">
+                AI 導入是<span class="accent-underline">流程設計</span>與<span class="accent-underline">人員帶動</span>的工作；
+                工具只是其中一個變數。
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 pt-6">
+            <div class="border-l-2 pl-4" style="border-color: var(--accent);">
+              <p class="kicker mb-1">關鍵 1</p>
+              <p class="text-app text-sm">流程設計優先於工具選型</p>
+            </div>
+            <div class="border-l-2 border-app pl-4">
+              <p class="kicker mb-1">關鍵 2</p>
+              <p class="text-app text-sm">使用者語言，不是技術語言</p>
+            </div>
+            <div class="border-l-2 border-app pl-4">
+              <p class="kicker mb-1">關鍵 3</p>
+              <p class="text-app text-sm">效益量化，不是感覺良好</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 05 — DIFFERENTIATION
+  ============================================================ -->
+  <section class="slide" data-slide="5">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">04 · Differentiation</span>
+        <span class="kicker text-app3">What Makes Us Different</span>
+      </header>
+
+      <div class="max-w-3xl mb-12">
+        <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+          三個<span class="italic text-accent">差異化</span>支點
+        </h2>
+        <p class="mt-6 text-app2 leading-relaxed max-w-2xl">
+          以下三點構成服務的核心定位，也是客戶選擇我們而非傳統 IT 顧問的理由。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-px flex-1 rounded-block overflow-hidden" style="background-color: var(--line);">
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-6">01</p>
+          <h3 class="text-app text-xl font-semibold mb-4">非工程背景顧問團隊</h3>
+          <p class="text-app2 text-sm leading-relaxed mb-6">
+            執行顧問來自業務、行銷、營運等實務背景，更能理解非技術團隊在導入過程中的真實阻力與語言障礙。
+          </p>
+          <p class="kicker">Front-line Empathy</p>
+        </div>
+
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-6">02</p>
+          <h3 class="text-app text-xl font-semibold mb-4">工程師後端支撐</h3>
+          <p class="text-app2 text-sm leading-relaxed mb-6">
+            技術需求由工程師夥伴負責，顧問專注在流程設計與人員帶動。雙軌並行，互不擠壓。
+          </p>
+          <p class="kicker">Dual-Track Delivery</p>
+        </div>
+
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-6">03</p>
+          <h3 class="text-app text-xl font-semibold mb-4">ROI 視覺化</h3>
+          <p class="text-app2 text-sm leading-relaxed mb-6">
+            評估階段就提供標準化效益試算，讓客戶在決策前就能看到預期節省金額，對內也容易說服決策者。
+          </p>
+          <p class="kicker">Quantified Decision</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 06 — SERVICE STRUCTURE
+  ============================================================ -->
+  <section class="slide" data-slide="6">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">05 · Service Architecture</span>
+        <span class="kicker text-app3">Three Tiers</span>
+      </header>
+
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+            三層<span class="italic text-accent">服務架構</span>
+          </h2>
+          <p class="mt-4 text-app2 max-w-xl">入門包建立信任、核心專案是主要收入、月費制穩定現金流。</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+
+        <div class="tier-card p-8 flex flex-col">
+          <div class="flex items-center justify-between mb-6">
+            <span class="kicker">Tier 01 · Entry</span>
+            <span class="mono text-xs text-app3">Trust Builder</span>
+          </div>
+          <h3 class="display-heavy text-app text-3xl mb-2">AI 健診報告</h3>
+          <p class="text-app3 text-sm mb-6">半天工作坊 · 流程盤點 · AI 切入點報告</p>
+          <div class="h-line mb-6"></div>
+          <ul class="text-app2 text-sm space-y-2 leading-relaxed">
+            <li>· 訪談關鍵角色（2–3 人）</li>
+            <li>· 現有流程繪製</li>
+            <li>· AI 可切入點優先排序</li>
+            <li>· 一頁式報告交付</li>
+          </ul>
+          <div class="mt-auto pt-8">
+            <p class="kicker mb-2">Investment</p>
+            <p class="display-bold text-accent text-3xl">NT$ 15,000 – 25,000</p>
+          </div>
+        </div>
+
+        <div class="tier-card is-featured p-8 flex flex-col relative">
+          <span class="absolute -top-3 left-8 kicker rounded-full px-3 py-1" style="background: var(--accent); color: var(--bg);">主要收入來源</span>
+          <div class="flex items-center justify-between mb-6">
+            <span class="kicker text-accent">Tier 02 · Core</span>
+            <span class="mono text-xs text-app3">Main Revenue</span>
+          </div>
+          <h3 class="display-heavy text-app text-3xl mb-2">AI 導入專案包</h3>
+          <p class="text-app3 text-sm mb-6">8–10 週 · 1–2 個工作流 · 完整落地</p>
+          <div class="h-line mb-6"></div>
+          <ul class="text-app2 text-sm space-y-2 leading-relaxed">
+            <li>· 工具選型與設定</li>
+            <li>· Prompt 範本庫建立</li>
+            <li>· SOP 文件交付</li>
+            <li>· 全員教育訓練</li>
+            <li>· 導入成果報告</li>
+          </ul>
+          <div class="mt-auto pt-8">
+            <p class="kicker mb-2 text-accent">Investment</p>
+            <p class="display-bold text-accent text-3xl">NT$ 50,000 – 120,000</p>
+          </div>
+        </div>
+
+        <div class="tier-card p-8 flex flex-col">
+          <div class="flex items-center justify-between mb-6">
+            <span class="kicker">Tier 03 · Retainer</span>
+            <span class="mono text-xs text-app3">Cash Flow</span>
+          </div>
+          <h3 class="display-heavy text-app text-3xl mb-2">AI 顧問月費制</h3>
+          <p class="text-app3 text-sm mb-6">每月固定時數 · 持續優化 · 內部支援</p>
+          <div class="h-line mb-6"></div>
+          <ul class="text-app2 text-sm space-y-2 leading-relaxed">
+            <li>· 每月固定顧問時數</li>
+            <li>· 新工具評估</li>
+            <li>· Prompt 持續迭代</li>
+            <li>· 內部使用者問答支援</li>
+          </ul>
+          <div class="mt-auto pt-8">
+            <p class="kicker mb-2">Investment</p>
+            <p class="display-bold text-accent text-3xl">NT$ 15,000 – 30,000<span class="text-base text-app3">/月</span></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 07 — METHODOLOGY
+  ============================================================ -->
+  <section class="slide" data-slide="7">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">06 · Methodology</span>
+        <span class="kicker text-app3">SOP Framework</span>
+      </header>
+
+      <div class="max-w-3xl mb-12">
+        <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+          導入<span class="italic text-accent">方法論</span>
+        </h2>
+        <p class="mt-4 text-app2">標準四階段，每個階段都有明確的交付物與成功標準。</p>
+      </div>
+
+      <div class="relative flex-1">
+        <div class="space-y-8">
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-1 flex items-center gap-4">
+              <span class="w-4 h-4 rounded-full z-10 relative" style="background: var(--accent); box-shadow: 0 0 0 4px var(--bg);"></span>
+            </div>
+            <div class="lg:col-span-3">
+              <p class="kicker mb-1">Phase 01</p>
+              <h3 class="display-heavy text-app text-2xl">盤點 · Diagnose</h3>
+              <p class="mono text-app3 text-xs mt-1">Week 1–2</p>
+            </div>
+            <div class="lg:col-span-8 text-app2 text-sm leading-relaxed border-l border-app pl-6">
+              <p>訪談關鍵角色，記錄每週重複性工作的時數與類型。繪製現有工作流程圖，標記 AI 可切入節點。</p>
+              <p class="kicker text-accent mt-3">交付物：流程圖 · 痛點優先序 · ROI 試算初稿</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-1 flex items-center gap-4">
+              <span class="w-4 h-4 rounded-full z-10 relative" style="background: var(--accent); box-shadow: 0 0 0 4px var(--bg);"></span>
+            </div>
+            <div class="lg:col-span-3">
+              <p class="kicker mb-1">Phase 02</p>
+              <h3 class="display-heavy text-app text-2xl">導入 · Implement</h3>
+              <p class="mono text-app3 text-xs mt-1">Week 3–5</p>
+            </div>
+            <div class="lg:col-span-8 text-app2 text-sm leading-relaxed border-l border-app pl-6">
+              <p>選定 1–2 個工作流作為第一波切入。設計專屬 Prompt 範本庫，並在真實專案中試跑。</p>
+              <p class="kicker text-accent mt-3">交付物：Prompt 範本庫 · 試跑成果 · 工具設定</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-1 flex items-center gap-4">
+              <span class="w-4 h-4 rounded-full z-10 relative" style="background: var(--accent); box-shadow: 0 0 0 4px var(--bg);"></span>
+            </div>
+            <div class="lg:col-span-3">
+              <p class="kicker mb-1">Phase 03</p>
+              <h3 class="display-heavy text-app text-2xl">標準化 · Codify</h3>
+              <p class="mono text-app3 text-xs mt-1">Week 6–7</p>
+            </div>
+            <div class="lg:col-span-8 text-app2 text-sm leading-relaxed border-l border-app pl-6">
+              <p>整理標準操作流程文件，包含使用時機判斷、Prompt 範本與輸出品質檢查清單。</p>
+              <p class="kicker text-accent mt-3">交付物：SOP 文件 · 品質檢查清單 · 知識庫</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-1 flex items-center gap-4">
+              <span class="w-4 h-4 rounded-full z-10 relative" style="background: var(--accent); box-shadow: 0 0 0 4px var(--bg);"></span>
+            </div>
+            <div class="lg:col-span-3">
+              <p class="kicker mb-1">Phase 04</p>
+              <h3 class="display-heavy text-app text-2xl">交接 · Transfer</h3>
+              <p class="mono text-app3 text-xs mt-1">Week 8</p>
+            </div>
+            <div class="lg:col-span-8 text-app2 text-sm leading-relaxed border-l border-app pl-6">
+              <p>全員工作坊與內部支援機制建立。重點：讓團隊學會自己迭代 Prompt，不依賴顧問長期駐場。</p>
+              <p class="kicker text-accent mt-3">交付物：教育訓練 · 導入成果報告 · 後續支援機制</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 08 — INDUSTRY SOLUTIONS
+  ============================================================ -->
+  <section class="slide" data-slide="8">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-10">
+        <span class="kicker">07 · Industry Solutions</span>
+        <span class="kicker text-app3">Click to Switch</span>
+      </header>
+
+      <div class="grid grid-cols-12 gap-12 flex-1">
+        <div class="col-span-12 lg:col-span-4">
+          <h2 class="display-bold text-app text-5xl leading-tight">
+            產業專屬<br/>
+            <span class="italic text-accent">解決方案</span>
+          </h2>
+          <p class="mt-6 text-app2 text-sm leading-relaxed">
+            針對四個目標產業，提供經過驗證的工具組合與導入 SOP。
+          </p>
+
+          <div class="mt-8 flex flex-col gap-2" id="industryTabs">
+            <button class="industry-chip selected text-left px-4 py-3 text-sm" data-industry="ad">
+              <span class="kicker block mb-1">A</span>廣告創意業
+            </button>
+            <button class="industry-chip text-left px-4 py-3 text-sm" data-industry="re">
+              <span class="kicker block mb-1">B</span>房地產業
+            </button>
+            <button class="industry-chip text-left px-4 py-3 text-sm" data-industry="agency">
+              <span class="kicker block mb-1">C</span>代銷業
+            </button>
+            <button class="industry-chip text-left px-4 py-3 text-sm" data-industry="media">
+              <span class="kicker block mb-1">D</span>廣告媒體業
+            </button>
+          </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-8 card-bordered p-8 lg:p-10" id="industryDetail">
+          <!-- 由 JS 渲染 -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 09 — ROI
+  ============================================================ -->
+  <section class="slide" data-slide="9">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">08 · ROI Framework</span>
+        <span class="kicker text-app3">Quantified Value</span>
+      </header>
+
+      <div class="grid grid-cols-12 gap-12 flex-1">
+        <div class="col-span-12 lg:col-span-5">
+          <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+            <span class="italic text-accent">ROI</span><br/>
+            從評估階段<br/>就視覺化
+          </h2>
+
+          <div class="mt-10 card-bordered p-6 bg-app2">
+            <p class="kicker mb-3 text-accent">標準試算公式</p>
+            <p class="mono text-app text-sm leading-loose">
+              年度可節省 =<br/>
+              <span class="text-accent">每週重複時數</span> ×<br/>
+              <span class="text-accent">人力時薪</span> ×<br/>
+              <span class="text-accent">AI 替代比例</span> ×<br/>
+              52 週
+            </p>
+          </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7">
+          <p class="kicker mb-6">範例情境 · 廣告創意業</p>
+
+          <div class="space-y-4 mb-8">
+            <div class="flex items-baseline justify-between border-b border-app pb-3">
+              <span class="text-app2 text-sm">人數</span>
+              <span class="display-heavy text-app text-2xl">3 <span class="text-app3 text-sm">位 AE</span></span>
+            </div>
+            <div class="flex items-baseline justify-between border-b border-app pb-3">
+              <span class="text-app2 text-sm">每人每週重複性工作時數</span>
+              <span class="display-heavy text-app text-2xl">5 <span class="text-app3 text-sm">小時</span></span>
+            </div>
+            <div class="flex items-baseline justify-between border-b border-app pb-3">
+              <span class="text-app2 text-sm">平均時薪</span>
+              <span class="display-heavy text-app text-2xl">NT$ 300</span>
+            </div>
+            <div class="flex items-baseline justify-between border-b border-app pb-3">
+              <span class="text-app2 text-sm">AI 替代比例</span>
+              <span class="display-heavy text-app text-2xl">40<span class="text-app3 text-sm">%</span></span>
+            </div>
+          </div>
+
+          <div class="border-2 border-accent rounded-block p-8 bg-app2">
+            <div class="grid grid-cols-3 gap-6">
+              <div>
+                <p class="kicker mb-2">年省金額</p>
+                <p class="display-bold text-accent text-2xl lg:text-3xl stat-num">NT$ 936,000</p>
+              </div>
+              <div>
+                <p class="kicker mb-2">導入投資</p>
+                <p class="display-bold text-app text-2xl lg:text-3xl stat-num">NT$ 80,000</p>
+              </div>
+              <div>
+                <p class="kicker mb-2">ROI 倍數</p>
+                <p class="display-bold text-accent text-3xl lg:text-4xl stat-num">11×</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="kicker text-app3 mt-6">＊ 數字為示意，實際試算依客戶現況進行</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 10 — CASE STUDY PLACEHOLDER
+  ============================================================ -->
+  <section class="slide" data-slide="10">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">09 · Case Study</span>
+        <span class="kicker text-app3">Proof of Work</span>
+      </header>
+
+      <div class="max-w-3xl mb-12">
+        <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+          實際<span class="italic text-accent">案例</span>與成果
+        </h2>
+        <p class="mt-4 text-app2">＊ 此頁待實際案例填入，以下為框架示意</p>
+      </div>
+
+      <div class="grid grid-cols-12 gap-8 flex-1">
+        <div class="col-span-12 lg:col-span-5 card-bordered p-8 bg-app2">
+          <p class="kicker mb-4">Client Profile</p>
+          <h3 class="display-heavy text-app text-2xl mb-2">[ 客戶名稱 ]</h3>
+          <p class="text-app3 text-sm mb-6">產業 · 規模 · 導入時間</p>
+
+          <div class="space-y-4 text-sm">
+            <div>
+              <p class="kicker mb-1">產業</p>
+              <p class="text-app2">[ 例：廣告創意業 ]</p>
+            </div>
+            <div>
+              <p class="kicker mb-1">團隊規模</p>
+              <p class="text-app2">[ 例：12 人 ]</p>
+            </div>
+            <div>
+              <p class="kicker mb-1">導入週期</p>
+              <p class="text-app2">[ 例：8 週 ]</p>
+            </div>
+            <div>
+              <p class="kicker mb-1">服務類型</p>
+              <p class="text-app2">[ 例：核心專案包 + 月費維運 ]</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-7 flex flex-col gap-4">
+          <div class="card-bordered p-6">
+            <p class="kicker mb-3 text-accent">Challenge · 挑戰</p>
+            <p class="text-app2 text-sm leading-relaxed">[ 客戶在導入前面臨的具體痛點，例如：每週花在報告整理的時數、人力瓶頸 ]</p>
+          </div>
+          <div class="card-bordered p-6">
+            <p class="kicker mb-3 text-accent">Approach · 做法</p>
+            <p class="text-app2 text-sm leading-relaxed">[ 我們選定的工具組合、Prompt 範本設計、教育訓練方式 ]</p>
+          </div>
+          <div class="card-bordered p-6 flex-1">
+            <p class="kicker mb-3 text-accent">Outcome · 成果</p>
+            <div class="grid grid-cols-3 gap-6 mt-4">
+              <div>
+                <p class="display-bold text-accent text-3xl stat-num">XX%</p>
+                <p class="kicker mt-2">時間節省</p>
+              </div>
+              <div>
+                <p class="display-bold text-accent text-2xl lg:text-3xl stat-num">NT$ XXX,XXX</p>
+                <p class="kicker mt-2">年化效益</p>
+              </div>
+              <div>
+                <p class="display-bold text-accent text-3xl stat-num">XX×</p>
+                <p class="kicker mt-2">ROI</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 11 — HOW TO START
+  ============================================================ -->
+  <section class="slide" data-slide="11">
+    <div class="reveal flex flex-col h-full">
+      <header class="flex items-center justify-between mb-12">
+        <span class="kicker">10 · Get Started</span>
+        <span class="kicker text-app3">Next Step</span>
+      </header>
+
+      <div class="max-w-3xl mb-16">
+        <h2 class="display-bold text-app text-5xl lg:text-6xl leading-tight">
+          從一場<span class="italic text-accent">健診</span>開始
+        </h2>
+        <p class="mt-6 text-app2 leading-relaxed max-w-2xl">
+          建議從「AI 健診工作坊」作為合作起點。半天的時間，
+          盤點最想優先處理的工作流，獲得一份可對內分享的切入點報告。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-px flex-1 rounded-block overflow-hidden" style="background-color: var(--line);">
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-4">01</p>
+          <p class="kicker mb-3">Step</p>
+          <h3 class="text-app text-xl font-semibold mb-3">30 分鐘對焦會議</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            線上初步對話，確認需求與適配方向。沒有壓力，純粹聊聊。
+          </p>
+        </div>
+
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-4">02</p>
+          <p class="kicker mb-3">Step</p>
+          <h3 class="text-app text-xl font-semibold mb-3">半天 AI 健診工作坊</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            到場訪談關鍵角色，現場輸出流程圖與優先序，會後 5 個工作天交付完整報告。
+          </p>
+        </div>
+
+        <div class="bg-app p-10">
+          <p class="display-bold text-accent text-5xl mb-4">03</p>
+          <p class="kicker mb-3">Step</p>
+          <h3 class="text-app text-xl font-semibold mb-3">決定下一步</h3>
+          <p class="text-app2 text-sm leading-relaxed">
+            依報告結果判斷是否進入核心專案包。健診費用可折抵後續專案。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SLIDE 12 — CLOSING
+  ============================================================ -->
+  <section class="slide grid-bg" data-slide="12">
+    <div class="noise"></div>
+    <div class="reveal flex flex-col h-full justify-between">
+
+      <header class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full" style="background: var(--accent);"></div>
+          <span class="kicker text-app2">Thank You</span>
+        </div>
+        <span class="kicker">End of Proposal</span>
+      </header>
+
+      <div class="max-w-5xl">
+        <p class="kicker mb-6">Let's Talk</p>
+        <h1 class="display-bold text-app text-[clamp(3rem,8vw,7rem)] leading-[0.95]">
+          下一步，<br/>
+          <span class="italic text-accent">就從一場對話</span><br/>
+          開始。
+        </h1>
+        <p class="mt-10 text-app2 text-lg max-w-2xl leading-relaxed">
+          先約一個 30 分鐘的視訊，分享其他公司的做法，
+          一起評估最適合的切入點。不用準備，純粹聊聊。
+        </p>
+      </div>
+
+      <footer class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t border-app">
+        <div>
+          <p class="kicker text-app3 mb-2">Contact</p>
+          <p class="display-heavy text-app text-xl">Josh</p>
+          <p class="text-app2 text-sm mt-1">AI 導入顧問</p>
+        </div>
+        <div>
+          <p class="kicker text-app3 mb-2">Email</p>
+          <p class="mono text-app text-sm">[ your-email@domain.com ]</p>
+        </div>
+        <div>
+          <p class="kicker text-app3 mb-2">Line / LinkedIn</p>
+          <p class="mono text-app text-sm">[ your-handle ]</p>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- HUD -->
+<div class="hud">
+  <div class="flex items-center gap-3">
+    <button id="prevBtn" class="nav-btn" aria-label="Previous slide">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button id="nextBtn" class="nav-btn" aria-label="Next slide">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-6">
+    <span class="mono text-xs text-app3" id="pageIndicator">01 / 12</span>
+    <span class="kicker text-app3 hidden md:inline">← → 切換頁面</span>
+  </div>
+</div>
+
+<script>
+  /* -------- Theme toggle -------- */
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeLabel  = document.getElementById('themeLabel');
+
+  function setTheme(name) {
+    root.setAttribute('data-theme', name);
+    themeLabel.textContent = name === 'dark' ? 'Light' : 'Dark';
+    try { localStorage.setItem('proposal-theme', name); } catch (e) {}
+  }
+
+  try {
+    const saved = localStorage.getItem('proposal-theme');
+    if (saved === 'light' || saved === 'dark') setTheme(saved);
+  } catch (e) {}
+
+  themeToggle.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  /* -------- Slide navigation -------- */
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  let current  = 0;
+
+  const progress      = document.getElementById('progress');
+  const pageIndicator = document.getElementById('pageIndicator');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function go(idx) {
+    current = (idx + total) % total;
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    pageIndicator.textContent = `${pad(current + 1)} / ${pad(total)}`;
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => go(current - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); go(current + 1);
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); go(current - 1);
+    }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End')  { e.preventDefault(); go(total - 1); }
+  });
+
+  go(0);
+
+  /* -------- Industry tabs -------- */
+  const industries = {
+    ad: {
+      name: '廣告創意業',
+      pain: 'AE 花大量時間在提案文件撰寫、客戶報告整理；文案需大量版本變體；素材製作依賴設計師。',
+      tools: ['Claude', 'Otter.ai', 'Midjourney', 'Canva AI', 'Notion AI'],
+      cycle: '8 週',
+      entry: '文案生成',
+      roi: '年省 ≈ NT$ 936,000 · ROI 11×',
+    },
+    re: {
+      name: '房地產業',
+      pain: '物件描述撰寫耗時；客戶詢問重複（價格、地段、格局）；廣告素材製作頻率高但缺乏設計資源。',
+      tools: ['Claude', 'Canva AI', 'Zapier', 'Otter.ai', 'NotebookLM'],
+      cycle: '8 週',
+      entry: '物件文案',
+      roi: '年省 ≈ NT$ 650,000 · ROI 10×',
+    },
+    agency: {
+      name: '代銷業',
+      pain: '橫跨廣告與銷售雙重痛點；建案文件管理費工；跨部門資訊流混亂。',
+      tools: ['Claude', 'Canva AI', 'Midjourney', 'NotebookLM', 'Zapier', 'Otter.ai'],
+      cycle: '10 週',
+      entry: '建案文件 + 來客整理',
+      roi: '年省 ≈ NT$ 1,404,000 · ROI 14×',
+    },
+    media: {
+      name: '廣告媒體業',
+      pain: '企劃文件與報表重複作業量大；文案需大量版本變體；跨角色協作缺乏系統。',
+      tools: ['Claude', 'ChatGPT', 'Perplexity', 'Canva AI', 'Notion AI', 'Zapier'],
+      cycle: '8 週',
+      entry: '企劃書 + 報表自動化',
+      roi: '年省 ≈ NT$ 1,200,000+ · ROI 13–20×',
+    },
+  };
+
+  const detail = document.getElementById('industryDetail');
+  const tabs   = document.querySelectorAll('.industry-chip');
+
+  function renderIndustry(key) {
+    const d = industries[key];
+    detail.innerHTML = `
+      <div class="flex items-start justify-between mb-8">
+        <div>
+          <p class="kicker mb-2 text-accent">Industry Focus</p>
+          <h3 class="display-bold text-app text-4xl">${d.name}</h3>
+        </div>
+        <span class="mono text-xs text-app3 border border-app rounded-soft px-3 py-1">${d.cycle}</span>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <p class="kicker mb-2">核心痛點</p>
+          <p class="text-app2 text-sm leading-relaxed">${d.pain}</p>
+        </div>
+
+        <div class="h-line"></div>
+
+        <div>
+          <p class="kicker mb-3">標準工具組合</p>
+          <div class="flex flex-wrap gap-2">
+            ${d.tools.map(t => `<span class="mono text-xs text-app border border-app rounded-full px-3 py-1">${t}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 pt-4">
+          <div class="border-l-2 pl-4" style="border-color: var(--accent);">
+            <p class="kicker mb-1">建議切入點</p>
+            <p class="text-app text-sm">${d.entry}</p>
+          </div>
+          <div class="border-l-2 pl-4" style="border-color: var(--accent);">
+            <p class="kicker mb-1">ROI 試算範例</p>
+            <p class="text-app text-sm">${d.roi}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('selected'));
+      tab.classList.add('selected');
+      renderIndustry(tab.dataset.industry);
+    });
+  });
+
+  renderIndustry('ad');
+
+  /* -------- Custom cursor (smooth follow) -------- */
+  (function() {
+    const dot  = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    if (!dot || !ring) return;
+
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let rx = mx, ry = my;
+    let visible = false;
+
+    document.addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      if (!visible) {
+        visible = true;
+        dot.style.opacity = 1;
+        ring.style.opacity = '';
+      }
+      dot.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', () => {
+      visible = false;
+      dot.style.opacity = 0;
+      ring.style.opacity = 0;
+    });
+
+    document.addEventListener('mousedown', () => ring.classList.add('is-click'));
+    document.addEventListener('mouseup',   () => ring.classList.remove('is-click'));
+
+    // Hover 偵測：凡是互動元素，ring 放大
+    const hoverSelector = 'button, a, .industry-chip, .nav-btn, .theme-toggle, .tier-card, .card-bordered';
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest(hoverSelector)) ring.classList.add('is-hover');
+    });
+    document.addEventListener('mouseout', (e) => {
+      if (e.target.closest(hoverSelector)) ring.classList.remove('is-hover');
+    });
+
+    // Smooth follow (easing)
+    function loop() {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      requestAnimationFrame(loop);
+    }
+    loop();
+  })();
+</script>
+
+</body>
+</html>

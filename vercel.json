@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/", "destination": "/ai-consulting-proposal_3.html" }]
+}
