@@ -5,7 +5,8 @@
       "Bash(npm --version)",
       "Bash(npm install *)",
       "Bash(sudo npm *)",
-      "Bash(npx vercel *)"
+      "Bash(npx vercel *)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }
