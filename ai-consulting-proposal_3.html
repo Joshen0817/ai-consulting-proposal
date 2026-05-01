@@ -1493,9 +1493,6 @@
     const slide = slides[index];
     if (!slide) return;
     slide.scrollTop = 0;
-    window.requestAnimationFrame(() => { slide.scrollTop = 0; });
-    window.setTimeout(() => { slide.scrollTop = 0; }, 80);
-    window.setTimeout(() => { slide.scrollTop = 0; }, TRANSITION_MS + 40);
   }
 
   function setSlidePositions(activeIndex) {
@@ -1533,6 +1530,7 @@
 
     isAnimating = true;
     current = next;
+    resetSlideScroll(next);
 
     slides.forEach((slide) => {
       slide.classList.remove(
@@ -1548,7 +1546,6 @@
 
     prevSlide.classList.add(leaveClass);
     nextSlide.classList.add(enterClass);
-    resetSlideScroll(next);
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -1561,7 +1558,7 @@
 
     window.setTimeout(() => {
       setSlidePositions(current);
-      resetSlideScroll(current);
+      resetSlideScroll(prev);
       isAnimating = false;
     }, TRANSITION_MS);
   }
